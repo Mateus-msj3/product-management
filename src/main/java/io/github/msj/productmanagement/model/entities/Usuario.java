@@ -32,7 +32,6 @@ public class Usuario {
     private String email;
 
     @NotBlank
-    @Size(max = 30)
     private String senha;
 
     @ManyToMany(fetch = FetchType.LAZY)

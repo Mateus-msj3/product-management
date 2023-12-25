@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ public class Produto {
     @Column(nullable = false, unique = true)
     private String sku;
 
+    @NotAudited
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
