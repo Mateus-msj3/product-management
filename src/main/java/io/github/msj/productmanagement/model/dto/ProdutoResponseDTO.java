@@ -35,4 +35,5 @@ public class ProdutoResponseDTO implements Serializable {
 
     private Integer quantidadeEstoque;
 
+    private String criadoPor;
 }

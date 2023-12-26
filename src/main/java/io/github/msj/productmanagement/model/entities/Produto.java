@@ -53,5 +53,8 @@ public class Produto {
 
     @Column(name = "quantidade_estoque", nullable = false)
     private Integer quantidadeEstoque;
+
+    @Column(name = "criado_por", length = 50)
+    private String criadoPor;
 }
 

@@ -1,13 +1,15 @@
 package io.github.msj.productmanagement.model.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -40,8 +42,6 @@ public class ProdutoRequestDTO implements Serializable {
     private BigDecimal valorVenda;
 
     private String imagemProduto;
-
-    private LocalDate dataCadastro;
 
     @NotNull(message = "Informe a quantidade em estoque")
     @Min(message = "O valor minimo deve ser maior que 0", value = 1)

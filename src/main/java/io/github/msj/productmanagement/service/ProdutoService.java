@@ -1,7 +1,6 @@
 package io.github.msj.productmanagement.service;
 
 import io.github.msj.productmanagement.exception.NotFoundException;
-import io.github.msj.productmanagement.model.dto.CategoriaDTO;
 import io.github.msj.productmanagement.model.dto.ConfiguracaoCamposDTO;
 import io.github.msj.productmanagement.model.dto.ProdutoRequestDTO;
 import io.github.msj.productmanagement.model.dto.ProdutoResponseDTO;
@@ -48,11 +47,13 @@ public class ProdutoService {
                 .orElseThrow(() -> new NotFoundException("Categoria não encontrada com ID: "
                         + produtoRequestDTO.getCategoria().getId()));
 
-        produtoRequestDTO.setCategoria(modelMapper.map(categoria, CategoriaDTO.class));
-        produtoRequestDTO.setDataCadastro(LocalDate.now());
-        Produto produto = produtoRepository.save(modelMapper.map(produtoRequestDTO, Produto.class));
-        logger.info("Produto salvo com sucesso: {}", produto);
-        return construirRetorno(produto);
+        Produto produto = modelMapper.map(produtoRequestDTO, Produto.class);
+        produto.setCriadoPor(usuarioService.obterUsuarioLogado().getName());
+        produto.setCategoria(categoria);
+        produto.setDataCadastro(LocalDate.now());
+        Produto produtoSalvo = produtoRepository.save(produto);
+        logger.info("Produto salvo com sucesso: {}", produtoSalvo);
+        return construirRetorno(produtoSalvo);
     }
 
     @Transactional
@@ -126,6 +127,7 @@ public class ProdutoService {
         strategyMap.put("valorVenda", new ValorVendaStrategy());
         strategyMap.put("valorCusto", new ValorCustoStrategy());
         strategyMap.put("icms", new IcmsStrategy());
+        strategyMap.put("criadoPor", new CriadorPorStrategy());
 
         Map<String, CampoStrategy> hideStrategyMap = new HashMap<>();
         hideStrategyMap.put("id", new NullStrategy());
@@ -139,6 +141,7 @@ public class ProdutoService {
         hideStrategyMap.put("valorVenda", new NullStrategy());
         hideStrategyMap.put("valorCusto", new NullStrategy());
         hideStrategyMap.put("icms", new NullStrategy());
+        hideStrategyMap.put("criadoPor", new NullStrategy());
 
         for (Map.Entry<String, CampoStrategy> entry : strategyMap.entrySet()) {
             String campo = entry.getKey();
