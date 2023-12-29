@@ -1,14 +1,16 @@
 package io.github.msj.productmanagement.controller;
 
-import io.github.msj.productmanagement.model.dto.ProdutoAgregadoDTO;
+import io.github.msj.productmanagement.model.dto.ProdutoAgregadoPageDTO;
 import io.github.msj.productmanagement.model.dto.ProdutoFiltroDTO;
-import io.github.msj.productmanagement.model.dto.ProdutoResponseDTO;
+import io.github.msj.productmanagement.model.dto.ProdutoPageDTO;
 import io.github.msj.productmanagement.service.ConsultaProdutoService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,14 +24,23 @@ public class ConsultaProdutoController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<ProdutoResponseDTO>> consultar(ProdutoFiltroDTO produtoFiltroDTO, Pageable pageable) {
-        return ResponseEntity.ok(consultaProdutoService.buscarProdutosComFiltros(produtoFiltroDTO, pageable));
+    public ResponseEntity<ProdutoPageDTO> consultar(ProdutoFiltroDTO produtoFiltroDTO,
+                                                    @RequestParam(defaultValue = "0")
+                                                    @PositiveOrZero int pagina,
+                                                    @RequestParam(defaultValue = "10")
+                                                    @Positive @Max(100) int tamanhoPagina,
+                                                    @RequestParam(defaultValue = "id,desc") String[] parametrosOrdenacao) {
+        return ResponseEntity.ok(consultaProdutoService.buscarProdutosComFiltros(produtoFiltroDTO, pagina, tamanhoPagina, parametrosOrdenacao));
     }
 
     @GetMapping("/agregados")
-    public ResponseEntity<Page<ProdutoAgregadoDTO>> listarProdutosAgregados(ProdutoFiltroDTO produtoFiltroDTO,
-                                                                            Pageable pageable) {
-        return ResponseEntity.ok(consultaProdutoService.listarValoresAgregados(produtoFiltroDTO, pageable));
+    public ResponseEntity<ProdutoAgregadoPageDTO> listarProdutosAgregados(ProdutoFiltroDTO produtoFiltroDTO,
+                                                                          @RequestParam(defaultValue = "0")
+                                                                          @PositiveOrZero int pagina,
+                                                                          @RequestParam(defaultValue = "10")
+                                                                          @Positive @Max(100) int tamanhoPagina,
+                                                                          @RequestParam(defaultValue = "id,desc") String[] parametrosOrdenacao) {
+        return ResponseEntity.ok(consultaProdutoService.listarValoresAgregados(produtoFiltroDTO, pagina, tamanhoPagina, parametrosOrdenacao));
     }
 
 
