@@ -8,8 +8,6 @@ import io.github.msj.productmanagement.model.entities.Categoria;
 import io.github.msj.productmanagement.model.entities.Produto;
 import io.github.msj.productmanagement.repository.CategoriaRepository;
 import io.github.msj.productmanagement.repository.ProdutoRepository;
-import io.github.msj.productmanagement.strategy.campo.CampoStrategy;
-import io.github.msj.productmanagement.strategy.campo.impl.*;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -19,9 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static io.github.msj.productmanagement.service.util.ProdutoUtil.construirDTO;
 
 
 @Service
@@ -112,53 +110,7 @@ public class ProdutoService {
                 });
     }
 
-    private ProdutoResponseDTO construirDTO(Produto produto, ConfiguracaoCamposDTO configuracaoCamposDTO) {
-        ProdutoResponseDTO produtoResponseDTO = new ProdutoResponseDTO();
-
-        Map<String, CampoStrategy> strategyMap = new HashMap<>();
-        strategyMap.put("id", new IdStrategy());
-        strategyMap.put("nome", new NomeStrategy());
-        strategyMap.put("imagemProduto", new ImagemStrategy());
-        strategyMap.put("ativo", new AtivoStrategy());
-        strategyMap.put("dataCadastro", new DataCadastroStrategy());
-        strategyMap.put("sku", new SKUStrategy());
-        strategyMap.put("categoria", new CategoriaStrategy());
-        strategyMap.put("quantidadeEstoque", new QuantidadeEstoqueStrategy());
-        strategyMap.put("valorVenda", new ValorVendaStrategy());
-        strategyMap.put("valorCusto", new ValorCustoStrategy());
-        strategyMap.put("icms", new IcmsStrategy());
-        strategyMap.put("criadoPor", new CriadorPorStrategy());
-
-        Map<String, CampoStrategy> hideStrategyMap = new HashMap<>();
-        hideStrategyMap.put("id", new NullStrategy());
-        hideStrategyMap.put("nome", new NullStrategy());
-        hideStrategyMap.put("imagemProduto", new NullStrategy());
-        hideStrategyMap.put("ativo", new NullStrategy());
-        hideStrategyMap.put("dataCadastro", new NullStrategy());
-        hideStrategyMap.put("sku", new NullStrategy());
-        hideStrategyMap.put("categoria", new NullStrategy());
-        hideStrategyMap.put("quantidadeEstoque", new NullStrategy());
-        hideStrategyMap.put("valorVenda", new NullStrategy());
-        hideStrategyMap.put("valorCusto", new NullStrategy());
-        hideStrategyMap.put("icms", new NullStrategy());
-        hideStrategyMap.put("criadoPor", new NullStrategy());
-
-        for (Map.Entry<String, CampoStrategy> entry : strategyMap.entrySet()) {
-            String campo = entry.getKey();
-            CampoStrategy strategy = entry.getValue();
-
-            if (configuracaoCamposDTO.getCamposOcultos() == null ||
-                    !configuracaoCamposDTO.getCamposOcultos().contains(campo)) {
-                strategy.atualizarCampo(produtoResponseDTO, produto);
-            } else {
-                new NullStrategy().atualizarCampo(produtoResponseDTO, produto);
-            }
-        }
-
-        return produtoResponseDTO;
-    }
-
-    private ProdutoResponseDTO construirRetorno(Produto produto) {
+    public ProdutoResponseDTO construirRetorno(Produto produto) {
         if (usuarioService.isEstoquista()) {
             ConfiguracaoCamposDTO configuracaoCamposDTO = configuracaoCamposService.obterConfiguracao();
             return construirDTO(produto, configuracaoCamposDTO);
