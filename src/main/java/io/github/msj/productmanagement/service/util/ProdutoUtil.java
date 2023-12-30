@@ -14,8 +14,42 @@ import java.util.Map;
 public class ProdutoUtil {
 
     public static ProdutoResponseDTO construirDTO(Produto produto, ConfiguracaoCamposDTO configuracaoCamposDTO) {
+        return processarCampos(produto, configuracaoCamposDTO, true);
+    }
+
+    public static ProdutoResponseDTO construirCamposRelatorio(Produto produto,
+                                                              ConfiguracaoCamposDTO configuracaoCamposDTO) {
+        return processarCampos(produto, configuracaoCamposDTO, false);
+    }
+
+    private static ProdutoResponseDTO processarCampos(Produto produto, ConfiguracaoCamposDTO configuracaoCamposDTO,
+                                                      boolean inverterCondicao) {
         ProdutoResponseDTO produtoResponseDTO = new ProdutoResponseDTO();
 
+        Map<String, CampoStrategy> strategyMap = criarStrategyMap();
+        Map<String, CampoStrategy> hideStrategyMap = criarHideStrategyMap();
+
+        for (Map.Entry<String, CampoStrategy> entry : strategyMap.entrySet()) {
+            String campo = entry.getKey();
+            CampoStrategy strategy = entry.getValue();
+
+            boolean condicao = configuracaoCamposDTO.getCamposOcultos() != null
+                    && configuracaoCamposDTO.getCamposOcultos().contains(campo);
+            if (inverterCondicao) {
+                condicao = !condicao;
+            }
+
+            if (condicao) {
+                strategy.atualizarCampo(produtoResponseDTO, produto);
+            } else {
+                hideStrategyMap.get(campo).atualizarCampo(produtoResponseDTO, produto);
+            }
+        }
+
+        return produtoResponseDTO;
+    }
+
+    private static Map<String, CampoStrategy> criarStrategyMap() {
         Map<String, CampoStrategy> strategyMap = new HashMap<>();
         strategyMap.put("id", new IdStrategy());
         strategyMap.put("nome", new NomeStrategy());
@@ -29,34 +63,15 @@ public class ProdutoUtil {
         strategyMap.put("valorCusto", new ValorCustoStrategy());
         strategyMap.put("icms", new IcmsStrategy());
         strategyMap.put("criadoPor", new CriadorPorStrategy());
+        return strategyMap;
+    }
 
+    private static Map<String, CampoStrategy> criarHideStrategyMap() {
         Map<String, CampoStrategy> hideStrategyMap = new HashMap<>();
-        hideStrategyMap.put("id", new NullStrategy());
-        hideStrategyMap.put("nome", new NullStrategy());
-        hideStrategyMap.put("imagemProduto", new NullStrategy());
-        hideStrategyMap.put("ativo", new NullStrategy());
-        hideStrategyMap.put("dataCadastro", new NullStrategy());
-        hideStrategyMap.put("sku", new NullStrategy());
-        hideStrategyMap.put("categoria", new NullStrategy());
-        hideStrategyMap.put("quantidadeEstoque", new NullStrategy());
-        hideStrategyMap.put("valorVenda", new NullStrategy());
-        hideStrategyMap.put("valorCusto", new NullStrategy());
-        hideStrategyMap.put("icms", new NullStrategy());
-        hideStrategyMap.put("criadoPor", new NullStrategy());
-
-        for (Map.Entry<String, CampoStrategy> entry : strategyMap.entrySet()) {
-            String campo = entry.getKey();
-            CampoStrategy strategy = entry.getValue();
-
-            if (configuracaoCamposDTO.getCamposOcultos() == null ||
-                    !configuracaoCamposDTO.getCamposOcultos().contains(campo)) {
-                strategy.atualizarCampo(produtoResponseDTO, produto);
-            } else {
-                new NullStrategy().atualizarCampo(produtoResponseDTO, produto);
-            }
+        for (String key : criarStrategyMap().keySet()) {
+            hideStrategyMap.put(key, new NullStrategy());
         }
-
-        return produtoResponseDTO;
+        return hideStrategyMap;
     }
 
     public static ProdutoAgregadoDTO construirRetornoProdutoAgregado(Produto produto) {
