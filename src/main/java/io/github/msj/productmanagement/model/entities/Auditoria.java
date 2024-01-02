@@ -1,33 +1,26 @@
 package io.github.msj.productmanagement.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.msj.productmanagement.config.AuditoriaRevisionListener;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.envers.DefaultRevisionEntity;
+import org.hibernate.envers.RevisionEntity;
 
 @Entity
 @Table(name = "auditoria")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Auditoria {
+@RevisionEntity(AuditoriaRevisionListener.class)
+@AttributeOverrides({
+        @AttributeOverride(name = "timestamp", column = @Column(name = "data_hora")),
+        @AttributeOverride(name = "id", column = @Column(name = "auditoria_id"))
+})
+@Getter
+@Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class Auditoria extends DefaultRevisionEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String objetoAlterado;
-
-    @Column(nullable = false)
-    private String acaoRealizada;
-
-    @Column(name = "data_hora", nullable = false)
-    private LocalDateTime dataHora;
-
-    @Column(name = "nome_usuario", nullable = false, length = 50)
-    private String nomeUsuario;
+    @Column(name = "usuario", nullable = false, length = 50)
+    private String usuario;
 
 }
