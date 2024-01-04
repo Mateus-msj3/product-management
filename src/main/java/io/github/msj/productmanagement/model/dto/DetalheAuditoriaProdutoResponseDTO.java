@@ -10,7 +10,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DetalheAuditoriaResponseDTO {
+public class DetalheAuditoriaProdutoResponseDTO {
+
+    private Integer idAuditoria;
 
     private List<AlteracaoCampoDTO> camposAlterados = new ArrayList<>();
 }
