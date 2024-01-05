@@ -13,7 +13,6 @@ import lombok.AllArgsConstructor;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +29,6 @@ public class AuditoriaProdutoService {
 
     private final AuditoriaProdutoRepository auditoriaProdutoRepository;
 
-    private final ModelMapper modelMapper;
-
     private final ProdutoRepository produtoRepository;
 
     private final ProdutoService produtoService;
@@ -45,7 +42,6 @@ public class AuditoriaProdutoService {
 
         List<AuditoriaResponseDTO> dtos = new ArrayList<>();
         for (Auditoria revInfo : results) {
-//            Produto produto = auditReader.find(Produto.class, id, revInfo.getRevisionDate());
 
             AuditoriaResponseDTO dto = new AuditoriaResponseDTO();
             dto.setId(Long.valueOf(revInfo.getId()));
@@ -76,7 +72,8 @@ public class AuditoriaProdutoService {
         return detalheAuditoria;
     }
 
-    private DetalheAuditoriaProdutoResponseDTO obterDetalhesCamposModificados(Integer idAuditoria, Produto produtoAtual, Produto produtoAnterior) {
+    private DetalheAuditoriaProdutoResponseDTO obterDetalhesCamposModificados(Integer idAuditoria, Produto produtoAtual,
+                                                                              Produto produtoAnterior) {
         DetalheAuditoriaProdutoResponseDTO detalheAuditoria = new DetalheAuditoriaProdutoResponseDTO();
         detalheAuditoria.setIdAuditoria(idAuditoria);
         List<AuditoriaCampoStrategy> strategies = Arrays.asList(
