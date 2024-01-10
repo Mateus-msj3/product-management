@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "produto")
-@Audited(withModifiedFlag = true)
+@Audited
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
