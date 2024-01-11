@@ -33,9 +33,9 @@ public class ProdutoSpecification {
                         produtoFiltroDTO.getDataCadastroDe(), produtoFiltroDTO.getDataCadastroAte()));
             }
 
-            if (produtoFiltroDTO.getCategoria() != null) {
+            if (produtoFiltroDTO.getIdCategoria() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("categoria").get("id"),
-                        produtoFiltroDTO.getCategoria().getId()));
+                        produtoFiltroDTO.getIdCategoria()));
             }
 
             if (produtoFiltroDTO.getValorCusto() != null) {

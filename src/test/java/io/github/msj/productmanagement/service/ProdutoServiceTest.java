@@ -245,6 +245,38 @@ class ProdutoServiceTest {
         }
 
         @Test
+        @DisplayName("Deve editar um Produto com sucesso quando alterar a categoria")
+        void deveEditarComSucessoQuandoAlterarCategoria() {
+            produtoRequest.setNome("Produto Teste com edição");
+            produtoRequest.setSku("SKU123402");
+            produtoRequest.setCategoria(new CategoriaDTO(2L, null, null, null));
+
+            when(produtoRepository.findById(ID)).thenReturn(Optional.of(produto));
+            when(categoriaRepository.findById(2L)).thenReturn(Optional.of(new Categoria(2L, "Categoria 2",
+                    true, TipoCategoria.ESPECIAL)));
+            when(produtoRepository.save(produtoArgumentCaptor.capture())).thenReturn(produto);
+            when(usuarioService.isEstoquista()).thenReturn(true);
+            when(configuracaoCamposService.obterConfiguracao())
+                    .thenReturn(new ConfiguracaoCamposDTO(ID, List.of("icms", "valorCusto")));
+
+            var retorno = produtoService.editar(ID, produtoRequest);
+            var produtoCapturado = produtoArgumentCaptor.getValue();
+
+            assertNotNull(retorno, "O retorno não deve ser nulo");
+            assertEquals(retorno.getNome(), produtoCapturado.getNome());
+            assertEquals(retorno.getSku(), produtoCapturado.getSku());
+            assertNull(retorno.getIcms(), "O ICMS deve ser nulo, " +
+                    "por causa da configuração de visualização de campos");
+            assertNull(retorno.getValorCusto(), "O valor de custo deve ser nulo, " +
+                    "por causa da configuração de visualização de campos");
+
+            verify(produtoRepository, times(1)).findById(ID);
+            verify(produtoRepository, times(1)).save(produtoArgumentCaptor.capture());
+            verify(usuarioService, times(2)).isEstoquista();
+            verify(configuracaoCamposService, times(1)).obterConfiguracao();
+        }
+
+        @Test
         @DisplayName("Deve editar um Produto com sucesso quando o usuário é um Administrador")
         void deveEditarComSucessoQuandoUsuarioAdministrador() {
             var produto = new Produto();
@@ -302,7 +334,6 @@ class ProdutoServiceTest {
         @Test
         @DisplayName("Deve lançar uma execeção ao tentar editar um produto quando não existir")
         void deveLancarExecacaoAoTentarEditararEProdutoNaoExistir() {
-            produtoRequest.setId(ID);
             when(produtoRepository.findById(ID)).thenReturn(Optional.empty());
 
             assertThrows(NotFoundException.class, () -> produtoService.editar(ID, produtoRequest));
@@ -313,9 +344,7 @@ class ProdutoServiceTest {
         @Test
         @DisplayName("Deve lançar uma execeção ao tentar editar um produto")
         void deveLancarExecacaoAoTentarEditar() {
-            produtoRequest.setId(ID);
-
-            when(produtoRepository.findById(produtoRequest.getId())).thenReturn(Optional.of(produto));
+            when(produtoRepository.findById(ID)).thenReturn(Optional.of(produto));
             when(produtoRepository.save(produto)).thenThrow(RuntimeException.class);
 
             assertThrows(RuntimeException.class, () -> produtoService.editar(ID, produtoRequest));

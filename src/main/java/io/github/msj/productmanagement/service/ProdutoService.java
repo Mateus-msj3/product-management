@@ -41,10 +41,7 @@ public class ProdutoService {
 
     @Transactional
     public ProdutoResponseDTO salvar(ProdutoRequestDTO produtoRequestDTO) {
-        Categoria categoria = categoriaRepository.findById(produtoRequestDTO.getCategoria().getId())
-                .orElseThrow(() -> new NotFoundException("Categoria não encontrada com ID: "
-                        + produtoRequestDTO.getCategoria().getId()));
-
+        Categoria categoria = buscarCategoria(produtoRequestDTO.getCategoria().getId());
         Produto produto = modelMapper.map(produtoRequestDTO, Produto.class);
         produto.setCriadoPor(usuarioService.obterUsuarioLogado().getName());
         produto.setCategoria(categoria);
@@ -58,9 +55,12 @@ public class ProdutoService {
     public ProdutoResponseDTO editar(Long id, ProdutoRequestDTO produtoRequestDTO) {
         Produto produto = findById(id);
         if (usuarioService.isEstoquista()) {
-            BeanUtils.copyProperties(produtoRequestDTO, produto, "id", "valorCusto", "icms");
+            BeanUtils.copyProperties(produtoRequestDTO, produto,"valorCusto", "icms");
         }else {
-            BeanUtils.copyProperties(produtoRequestDTO, produto, "id");
+            BeanUtils.copyProperties(produtoRequestDTO, produto);
+        }
+        if (!produto.getCategoria().getId().equals(produtoRequestDTO.getCategoria().getId())) {
+            produto.setCategoria(buscarCategoria(produtoRequestDTO.getCategoria().getId()));
         }
         Produto produtoEditado = produtoRepository.save(produto);
         logger.info("Produto editado com sucesso: {}", produtoEditado);
@@ -100,6 +100,12 @@ public class ProdutoService {
         produtoEncontrado.setAtivo(Boolean.FALSE);
         produtoRepository.save(produtoEncontrado);
         logger.info("Produto inativado com sucesso. ID: {}", id);
+    }
+
+    private Categoria buscarCategoria(Long id) {
+        Categoria categoria = categoriaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Categoria não encontrada com ID: " + id));
+        return categoria;
     }
 
     private Produto findById(Long id) {

@@ -25,7 +25,7 @@ public class ProdutoFiltroDTO implements Serializable {
 
     private String sku;
 
-    private CategoriaDTO categoria;
+    private Long idCategoria;
 
     private BigDecimal valorCusto;
 

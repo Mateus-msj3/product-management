@@ -18,8 +18,6 @@ import java.math.BigDecimal;
 @Builder
 public class ProdutoRequestDTO implements Serializable {
 
-    private Long id;
-
     @NotEmpty(message = "É necessário informar o nome")
     private String nome;
 
