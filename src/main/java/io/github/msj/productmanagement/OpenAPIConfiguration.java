@@ -18,25 +18,10 @@ import org.springframework.context.annotation.Configuration;
 )
 public class OpenAPIConfiguration {
 
-//    @Bean
-//    public OpenAPI customizeOpenAPI() {
-//        final String securitySchemeName = "bearerAuth";
-//        return new OpenAPI()
-//                .addSecurityItem(new SecurityRequirement()
-//                        .addList(securitySchemeName))
-//                .components(new Components()
-//                        .addSecuritySchemes(securitySchemeName, new SecurityScheme()
-//                                .name(securitySchemeName)
-//                                .type(SecurityScheme.Type.HTTP)
-//                                .scheme("bearer")
-//                                .bearerFormat("JWT")));
-//    }
-
     @Bean
     public OpenAPI springOpenAPI() {
-        final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
-                .info(new Info().title("SpringBoot API")
+                .info(new Info().title("API de Gerenciamento de Produtos")
                         .description("SpringBoot sample application")
                         .version("v0.0.1")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
@@ -45,13 +30,4 @@ public class OpenAPIConfiguration {
                         .url("https://springboot.wiki.github.org/docs"));
     }
 
-//    @Bean
-//    public OpenAPI customOpenAPI() {
-//        Map<String, Schema> schemas = new HashMap<>();
-//        schemas.put("ProdutoFiltroDTO", new Schema<>()
-//                .example(new Example().value(new ProdutoFiltroDTO(null, null, null,
-//                        null, null, null, null, null,
-//                        null, null, null, null, null)))).jsonSchemaImpl(ProdutoFiltroDTO.class);
-//        return new OpenAPI().components(new Components().schemas(schemas));
-//    }
 }
